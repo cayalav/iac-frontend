@@ -1,191 +1,125 @@
-###############################################################################
-# General
-###############################################################################
 variable "region" {
-  description = "AWS region to deploy primary resources"
   type        = string
-}
-
-variable "profile" {
-  description = "Optional AWS named profile for authentication"
-  type        = string
-  default     = ""
+  description = "AWS region to deploy regional resources."
 }
 
 variable "project_name" {
-  description = "Human readable project identifier used for tagging"
   type        = string
+  description = "Project identifier used in tagging."
 }
 
 variable "environment" {
-  description = "Environment label appended to resource names"
   type        = string
-  default     = "prod"
+  description = "Environment identifier used in tagging."
 }
 
-variable "tags" {
-  description = "Additional tags to associate with all supported resources"
-  type        = map(string)
-  default     = {}
-}
-
-###############################################################################
-# Domain & DNS
-###############################################################################
 variable "domain_name" {
-  description = "Primary domain name served by CloudFront"
   type        = string
+  description = "Primary domain name served by CloudFront."
 }
 
 variable "alternate_domain_names" {
-  description = "Additional domain names (SANs) for CloudFront and ACM"
   type        = list(string)
+  description = "Additional domain aliases for the CloudFront distribution."
   default     = []
 }
 
+variable "acm_certificate_arn" {
+  type        = string
+  description = "ARN of the ACM certificate in us-east-1 for CloudFront."
+}
+
 variable "create_hosted_zone" {
-  description = "Create a public Route53 hosted zone for the domain"
   type        = bool
+  description = "Whether to create a public Route 53 hosted zone for the domain."
   default     = false
-}
-
-variable "hosted_zone_name" {
-  description = "Hosted zone name when creating or looking up by name"
-  type        = string
-  default     = ""
-}
-
-variable "hosted_zone_id" {
-  description = "Existing Route53 hosted zone ID (skip creation when provided)"
-  type        = string
-  default     = ""
 }
 
 variable "hosted_zone_comment" {
-  description = "Optional comment stored on the created hosted zone"
   type        = string
-  default     = ""
+  description = "Comment applied to the hosted zone when created."
+  default     = "Managed by Terraform"
 }
 
-variable "hosted_zone_force_destroy" {
-  description = "Allow Terraform to delete the hosted zone even if records exist"
-  type        = bool
-  default     = false
+variable "hosted_zone_id" {
+  type        = string
+  description = "Existing Route 53 hosted zone ID when not creating a new zone."
+  default     = ""
 }
 
 variable "create_www_record" {
-  description = "Create a www.<domain> alias pointing to CloudFront"
   type        = bool
-  default     = true
+  description = "Whether to create a www CNAME/alias record pointing to the distribution."
+  default     = false
 }
 
-variable "www_subdomain" {
-  description = "Subdomain label used when create_www_record is true"
-  type        = string
-  default     = "www"
-}
-
-###############################################################################
-# S3 Static Site
-###############################################################################
 variable "site_bucket_name" {
-  description = "Explicit S3 bucket name for the frontend artifacts. Leave empty to autogenerate."
   type        = string
-  default     = ""
+  description = "Unique name of the S3 bucket that stores the site assets."
 }
 
 variable "s3_force_destroy" {
-  description = "Allow Terraform to delete the S3 bucket even when objects remain"
   type        = bool
+  description = "Allow Terraform to delete the bucket even when it holds objects."
   default     = false
 }
 
 variable "s3_enable_versioning" {
-  description = "Enable versioning on the static site bucket"
   type        = bool
+  description = "Enable object versioning on the site bucket."
   default     = true
 }
 
-###############################################################################
-# CloudFront
-###############################################################################
 variable "default_root_object" {
-  description = "Default root object served by CloudFront"
   type        = string
+  description = "Default object served by CloudFront when no specific file is requested."
   default     = "index.html"
 }
 
 variable "price_class" {
-  description = "CloudFront price class"
   type        = string
+  description = "CloudFront price class to limit the edge locations used."
   default     = "PriceClass_100"
 }
 
 variable "compress_objects" {
-  description = "Enable CloudFront compression for supported content types"
   type        = bool
+  description = "Enable automatic HTTP compression by CloudFront."
   default     = true
 }
 
-variable "default_ttl" {
-  description = "Default TTL (seconds) for cached objects"
-  type        = number
-  default     = 86400
-}
-
-variable "max_ttl" {
-  description = "Maximum TTL (seconds) for cached objects"
-  type        = number
-  default     = 31536000
-}
-
-variable "min_ttl" {
-  description = "Minimum TTL (seconds) for cached objects"
-  type        = number
-  default     = 0
-}
-
 variable "geo_restriction_type" {
-  description = "Geo restriction strategy: none, whitelist, or blacklist"
   type        = string
+  description = "CloudFront geo restriction type: none, whitelist, or blacklist."
   default     = "none"
 }
 
 variable "geo_restriction_locations" {
-  description = "ISO country codes applied when geo restriction is enabled"
   type        = list(string)
+  description = "List of country codes used with geo restrictions."
   default     = []
 }
 
 variable "enable_cloudfront_logging" {
-  description = "Enable CloudFront access logging"
   type        = bool
+  description = "Enable access logging for the CloudFront distribution."
   default     = false
 }
 
 variable "logging_bucket_domain_name" {
-  description = "S3 bucket domain name that receives CloudFront logs (required when logging enabled)"
   type        = string
+  description = "Domain name of the S3 bucket that stores CloudFront logs. Required when logging is enabled."
   default     = ""
 }
 
 variable "logging_prefix" {
-  description = "Prefix applied to CloudFront access logs"
   type        = string
+  description = "Prefix applied to CloudFront access logs."
   default     = "cloudfront/"
 }
 
-###############################################################################
-# ACM
-###############################################################################
-variable "create_acm_validation_records" {
-  description = "Create Route53 validation records for the ACM certificate"
-  type        = bool
-  default     = true
-}
-
-variable "acm_validation_record_ttl" {
-  description = "TTL (seconds) used for ACM validation DNS records"
-  type        = number
-  default     = 60
+variable "tags" {
+  type        = map(string)
+  description = "Additional tags applied to all taggable resources."
+  default     = {}
 }

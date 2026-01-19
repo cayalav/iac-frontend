@@ -1,10 +1,20 @@
-provider "aws" {
-  region  = var.region
-  profile = var.profile != "" ? var.profile : null
+terraform {
+  required_version = ">= 1.5.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  backend "s3" {
+    bucket = "tf-state-448261840709"
+    key    = "iac-frontend/terraform.tfstate"
+    region = "us-east-1"
+  }
 }
 
 provider "aws" {
-  alias   = "us_east_1"
-  region  = "us-east-1"
-  profile = var.profile != "" ? var.profile : null
+  region = var.region
 }
